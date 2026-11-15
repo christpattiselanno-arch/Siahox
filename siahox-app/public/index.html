@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SI AHOX — Sistem Anti Hoax Kota Ambon</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  /* Tata letak: hero dua kolom (slogan di kiri, kartu pemeriksaan di kanan), hasil dan klarifikasi di bawah selebar halaman. Satu tema terang, mengikuti prototipe SI AHOX. */
+  :root{
+    color-scheme:light;
+    --bg:#fff9f7; --surface:#ffffff; --field:#fffdfb; --ink:#34171d; --muted:#765e63; --line:#eedcdd; --soft:#fbe5e7;
+    --accent:#b51f3b; --accent-deep:#80152d; --on-accent:#ffffff;
+    --hoaks:#a3162f; --hoaks-bg:#fbe5e7;
+    --benar:#1f7a4d; --benar-bg:#e5f3ea;
+    --ragu:#8a5a00;  --ragu-bg:#fdf0d6;
+    --display:"Manrope","Segoe UI",system-ui,sans-serif;
+    --body:"DM Sans","Segoe UI",system-ui,sans-serif;
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{margin:0;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+    background-color:var(--bg);
+    background-image:radial-gradient(at 88% 0%,#ffdfe2 0,transparent 40%),linear-gradient(160deg,#fff9f7 0%,#fffdfb 55%,#fff0f2 100%);
+    background-repeat:no-repeat;background-size:100% 900px,100% 100%}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 20px 56px;display:flex;flex-direction:column;gap:20px}
+  h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding-bottom:8px}
+  .brand{display:flex;align-items:center;gap:10px;color:var(--accent)}
+  .brand svg{width:34px;height:34px;flex:none}
+  .brand b{display:block;font:800 19px/1.05 var(--display);letter-spacing:.01em}
+  .brand span{display:block;font:700 12px/1.2 var(--display)}
+  nav{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;font-size:14px;font-weight:600}
+  nav a{color:var(--ink);text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  .demo{font:700 11px var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--accent-deep);background:var(--soft);padding:6px 12px;border-radius:30px}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:40px;align-items:start;padding-top:24px}
+  .eyebrow{font:700 11px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin:0 0 18px}
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .hero h1{font-size:clamp(44px,7.4vw,82px);font-weight:800;line-height:1;letter-spacing:-.03em}
+  .hero h1 em{font-style:normal;color:var(--accent);box-shadow:inset 0 -.12em 0 var(--soft)}
+  .lead{font-size:clamp(18px,2.2vw,22px);line-height:1.4;margin:22px 0 14px}
+  .sub{color:var(--muted);font-size:15px;margin:0;max-width:46ch}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+  .cardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .cardhead small{font:700 11px var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .card h2{font-size:24px;font-weight:700}
+  .tabs{display:flex;gap:10px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab{flex:1 1 110px;border:1px solid var(--line);background:var(--field);color:var(--ink);padding:14px 10px;border-radius:10px;font:700 13px var(--body);cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--soft);border-color:var(--accent);color:var(--accent-deep)}
+  .pane{display:none;flex-direction:column;gap:12px}
+  .pane.on{display:flex}
+  label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+  .hint{font-size:13px;color:var(--muted);margin:0}
+  textarea,input[type=url]{width:100%;border:1px solid #e3cbcf;background:var(--field);color:var(--ink);border-radius:8px;padding:11px;font:inherit;font-size:14px;resize:vertical}
+  textarea{min-height:120px}
+  .drop{border:1.5px dashed #e3cbcf;border-radius:10px;padding:22px 14px;text-align:center;color:var(--muted);cursor:pointer;background:var(--field)}
+  .drop.over{border-color:var(--accent);color:var(--accent)}
+  .drop b{color:var(--ink)}
+  .prev{display:none;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .prev img{max-width:100%;max-height:260px;border-radius:8px;border:1px solid var(--line)}
+  .prev .meta{flex:1 1 200px;font-size:13px;color:var(--muted)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{border:0;background:linear-gradient(110deg,var(--accent-deep),#c51f3e);color:var(--on-accent);padding:13px 20px;border-radius:8px;font:700 14px var(--body);cursor:pointer}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:var(--field);color:var(--accent);border:1px solid var(--line);padding:9px 13px;font-size:13px;font-weight:600}
+  button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible,.drop:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+  .status{display:none;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+  .spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:r 1s linear infinite}
+  @keyframes r{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.spin{animation:none}html{scroll-behavior:auto}}
+  .err{display:none;background:var(--hoaks-bg);color:var(--hoaks);padding:12px;border-radius:8px;font-size:14px}
+
+  #result{display:flex;flex-direction:column;gap:18px}
+  .tag{display:inline-block;font:700 11px var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:30px;background:var(--soft);color:var(--accent-deep)}
+  .verdict{border-radius:12px;padding:18px;border-left:6px solid currentColor;display:flex;flex-direction:column;gap:10px}
+  .z-hoaks{background:var(--hoaks-bg);color:var(--hoaks)}
+  .z-benar{background:var(--benar-bg);color:var(--benar)}
+  .z-ragu{background:var(--ragu-bg);color:var(--ragu)}
+  .vtop{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .vlabel{font:800 24px var(--display);line-height:1.2}
+  .vscore{font:800 38px var(--display);font-variant-numeric:tabular-nums;line-height:1}
+  .vscore small{font-size:13px;font-weight:600;display:block;text-align:right}
+  .scale{position:relative;height:14px;border-radius:7px;display:flex;margin-top:4px}
+  .scale i{display:block;height:100%}
+  .scale .s1{width:40%;background:var(--benar);border-radius:7px 0 0 7px;opacity:.55}
+  .scale .s2{width:21%;background:var(--ragu);opacity:.55}
+  .scale .s3{width:39%;background:var(--hoaks);border-radius:0 7px 7px 0;opacity:.55}
+  .scale .mark{position:absolute;top:-5px;width:6px;height:24px;margin-left:-3px;border-radius:3px;background:var(--ink);box-shadow:0 0 0 2px var(--surface)}
+  .ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--ink);opacity:.8;font-variant-numeric:tabular-nums}
+  .vsum{color:var(--ink);margin:0;max-width:75ch}
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px 32px}
+  h3{font-size:16px;font-weight:700;margin-bottom:8px}
+  ul{margin:0;padding-left:20px} li{margin:3px 0}
+  .comp{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--line)}
+  .comp:first-of-type{border-top:0;padding-top:0}
+  .comp .n{font-weight:600}
+  .comp .n small{font-weight:400;color:var(--muted);margin-left:6px}
+  .comp .v{font:700 15px var(--display);font-variant-numeric:tabular-nums}
+  .comp .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+  .comp .bar i{display:block;height:100%;background:var(--accent)}
+  .comp .c{grid-column:1/-1;font-size:14px;color:var(--muted)}
+  .comp.off .v,.comp.off .n{color:var(--muted)}
+  .src{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--bg)}
+  .src p{margin:4px 0 0;font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{padding:8px 14px;border-radius:30px;border:1px solid var(--line);background:var(--field);color:var(--accent);text-decoration:none;font-size:14px;font-weight:600}
+  .chip:hover{border-color:var(--accent)}
+  .queue{border-radius:12px;padding:14px;font-size:14px;border:1px solid var(--line);background:var(--bg)}
+  .queue.need{background:var(--ragu-bg);border-color:transparent}
+  .queue b{font-family:var(--display)}
+  .disc{border:1px dashed #cdb3b8;border-radius:12px;padding:14px;font-size:14px;color:var(--muted)}
+  .disc b{color:var(--ink)}
+  .klar{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .klar .src b{font-family:var(--display);font-size:14px;color:var(--accent-deep)}
+  footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+  @media (max-width:860px){.hero{grid-template-columns:1fr;gap:24px;padding-top:8px}}
+  .setuju{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:13px;color:var(--muted);margin:14px 0 0}
+  .setuju input{margin-top:3px;accent-color:var(--accent);flex:none}
+  .src a,footer a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3 5 7v9c0 7.5 5 12.5 12 15 7-2.5 12-7.5 12-15V7L17 3Z"/><path d="m11.5 16.5 4 4 7-8"/></svg>
+      <div><b>SI AHOX</b><span>Sistem Anti Hoax</span></div>
+    </div>
+    <nav>
+      <a href="#cek">Cek informasi</a>
+      <a href="#result">Hasil</a>
+      <a href="#klarifikasi">Klarifikasi</a>
+      <span class="demo">Versi uji coba, belum resmi</span>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <p class="eyebrow">Ambon cerdas, informasi berkualitas</p>
+      <h1>Cek dolo,<br>baru <em>bagi.</em></h1>
+      <p class="lead">Kabar boleh cepat menyebar.<br>Kebenaran tetap perlu diperiksa.</p>
+      <p class="sub">SI AHOX memeriksa foto, link berita, dan chat WhatsApp yang meragukan, lalu memberi skor indikasi hoaks beserta alasan dan sumbernya.</p>
+    </div>
+  <section class="card" id="cek" aria-label="Kirim untuk diperiksa">
+    <div class="cardhead"><small>01 / Mulai di sini</small><span class="tag">Versi pilot</span></div>
+    <h2>Apa yang ingin dicek?</h2>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-pane="foto" id="tab-foto">Foto</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="link" id="tab-link">Link berita</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="wa" id="tab-wa">Chat WA</button>
+    </div>
+
+    <div class="pane on" id="pane-foto">
+      <div class="drop" id="foto-drop" tabindex="0" role="button" aria-label="Pilih foto">
+        <b>Pilih foto</b> atau seret ke sini
+        <p class="hint">Poster, foto kejadian, atau gambar yang beredar. JPG, PNG, WebP.</p>
+      </div>
+      <input type="file" id="foto-file" accept="image/*" hidden>
+      <div class="prev" id="foto-prev"><img id="foto-img" alt="Pratinjau foto"><div class="meta" id="foto-meta"></div></div>
+      <div>
+        <label for="foto-ctx">Keterangan yang menyertai foto (opsional)</label>
+        <textarea id="foto-ctx" style="min-height:64px" placeholder="Contoh: beredar di grup dengan tulisan &quot;banjir di Passo pagi ini&quot;"></textarea>
+      </div>
+      <div class="row">
+        <button class="btn" id="btn-foto" disabled>Periksa foto</button>
+        <button class="btn ghost" id="foto-reset" hidden>Ganti foto</button>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-link">
+      <div>
+        <label for="link-url">Alamat tautan</label>
+        <input type="url" id="link-url" placeholder="https://…">
+      </div>
+      <div>
+        <label for="link-text">Isi berita (opsional)</label>
+        <textarea id="link-text" placeholder="Salin judul dan beberapa paragraf isinya ke sini"></textarea>
+        <p class="hint">SI AHOX membuka tautan itu sendiri. Tempel isinya hanya jika halamannya tidak bisa dibuka.</p>
+      </div>
+      <div class="row"><button class="btn" id="btn-link">Periksa link</button></div>
+    </div>
+
+    <div class="pane" id="pane-wa">
+      <div>
+        <label for="wa-text">Tempel isi pesan WhatsApp</label>
+        <textarea id="wa-text" placeholder="Tempel pesan berantai di sini"></textarea>
+      </div>
+      <p class="hint">Atau unggah tangkapan layar percakapan:</p>
+      <div class="drop" id="wa-drop" tabindex="0" role="button" aria-label="Pilih tangkapan layar">
+        <b>Pilih tangkapan layar</b> atau seret ke sini
+      </div>
+      <input type="file" id="wa-file" accept="image/*" hidden>
+      <div class="prev" id="wa-prev"><img id="wa-img" alt="Pratinjau tangkapan layar"><div class="meta" id="wa-meta"></div></div>
+      <p class="hint">Nomor telepon di teks disamarkan sebelum diperiksa. Yang dinilai adalah isi pesan, bukan pengirimnya.</p>
+      <div class="row">
+        <button class="btn" id="btn-wa">Periksa chat</button>
+        <button class="btn ghost" id="wa-reset" hidden>Hapus tangkapan layar</button>
+      </div>
+    </div>
+
+    <label class="setuju" for="setuju"><input type="checkbox" id="setuju"> <span>Saya setuju kiriman ini diproses AI dan disimpan untuk ditinjau petugas. Data pribadi yang tidak perlu sudah saya hapus.</span></label>
+
+    <div class="status" id="status" style="margin-top:12px"><div class="spin"></div><span id="status-text">Menganalisis…</span></div>
+    <div class="err" id="err" style="margin-top:12px" role="alert"></div>
+  </section>
+  </div>
+
+  <section class="card" id="result" aria-live="polite" style="display:none">
+    <div class="cardhead" style="margin:0">
+      <h2>Hasil pemeriksaan</h2>
+    </div>
+
+    <div class="verdict" id="verdict">
+      <div class="vtop">
+        <div class="vlabel" id="v-label"></div>
+        <div class="vscore"><span id="v-score"></span><small id="v-conf"></small></div>
+      </div>
+      <div>
+        <div class="scale"><i class="s1"></i><i class="s2"></i><i class="s3"></i><span class="mark" id="v-mark"></span></div>
+        <div class="ticks"><span>0 benar</span><span>40</span><span>60</span><span>hoaks 100</span></div>
+      </div>
+      <p class="vsum" id="v-sum"></p>
+    </div>
+
+    <div class="cols">
+    <div id="sec-klaim"><h3>Klaim yang diperiksa</h3><ul id="klaim"></ul></div>
+
+    <div>
+      <h3>Rincian skor indikasi hoaks</h3>
+      <div id="comps"></div>
+      <p class="hint" style="margin-top:8px">Skor akhir adalah rata-rata berbobot dari komponen yang punya data. Komponen tanpa data tidak dihitung.</p>
+    </div>
+
+    <div id="sec-alasan"><h3>Alasan</h3><ul id="alasan"></ul></div>
+
+    <div>
+      <h3>Sumber</h3>
+      <div id="src-match"></div>
+      <div id="rujukan"></div>
+      <p class="hint" style="margin:8px 0">Cek silang sendiri dengan kata kunci dari klaim di atas:</p>
+      <div class="chips" id="links"></div>
+    </div>
+
+    </div>
+
+    <div class="queue" id="queue"></div>
+
+    <div class="disc"><b>Disclaimer.</b> Hasil ini analisis otomatis AI, bukan pernyataan resmi Pemerintah Kota Ambon. Skor menunjukkan kuatnya indikasi, bukan kepastian. Periksa sumber sebelum membagikan.</div>
+
+    <div class="row">
+      <button class="btn ghost" id="btn-copy">Salin hasil untuk dibagikan</button>
+      <span class="hint" id="copied"></span>
+    </div>
+  </section>
+
+  <section class="card" id="klarifikasi">
+    <div class="cardhead">
+      <h2>Klarifikasi Pemkot</h2>
+    </div>
+    <p class="hint" style="margin-bottom:12px">Kabar yang sudah diperiksa dan diklarifikasi petugas. Daftar ini menjadi pembanding utama setiap pemeriksaan.</p>
+    <div class="klar" id="klar"></div>
+  </section>
+
+  <footer>SI AHOX masih dalam uji coba dan belum menjadi kanal resmi Pemerintah Kota Ambon. Kiriman diproses AI dan disimpan untuk ditinjau petugas; nomor telepon dalam teks disamarkan. <a href="/petugas.html">Masuk petugas</a></footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id)};
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+  function tautanAman(u){return /^https?:\/\//i.test(String(u||""))}
+
+  /* ---------- klarifikasi terbit ---------- */
+  fetch("/api/klarifikasi").then(function(r){return r.json()}).then(function(j){
+    var k=(j&&j.klarifikasi)||[];
+    $("klar").innerHTML=k.length?k.map(function(x){
+      return '<div class="src"><b>'+esc(x.id)+" · "+esc(x.kategori)+'</b><p><i>Beredar:</i> '+esc(x.hoaks)+'</p><p><i>Klarifikasi:</i> '+esc(x.fakta)+"</p>"+
+        (tautanAman(x.sumber_url)?'<p><a href="'+esc(x.sumber_url)+'" target="_blank" rel="noopener">Baca rilis resmi</a></p>':"")+"</div>";
+    }).join(""):'<p class="hint">Belum ada klarifikasi yang diterbitkan.</p>';
+  }).catch(function(){$("klar").innerHTML='<p class="hint">Daftar klarifikasi belum bisa dimuat.</p>'});
+
+  /* ---------- tab ---------- */
+  var active="foto";
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      active=t.dataset.pane;
+      document.querySelectorAll(".tab").forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false")});
+      document.querySelectorAll(".pane").forEach(function(p){p.classList.toggle("on",p.id==="pane-"+active)});
+    });
+  });
+
+  /* ---------- unggah gambar ---------- */
+  function fmtBytes(n){return n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB"}
+  function uploader(prefix,onChange){
+    var st={blob:null};
+    var drop=$(prefix+"-drop"), file=$(prefix+"-file"), prev=$(prefix+"-prev"), img=$(prefix+"-img"), reset=$(prefix+"-reset");
+    function pick(){file.click()}
+    drop.addEventListener("click",pick);
+    drop.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick()}});
+    ["dragenter","dragover"].forEach(function(n){drop.addEventListener(n,function(e){e.preventDefault();drop.classList.add("over")})});
+    ["dragleave","drop"].forEach(function(n){drop.addEventListener(n,function(e){e.preventDefault();drop.classList.remove("over")})});
+    drop.addEventListener("drop",function(e){var f=e.dataTransfer.files[0]; if(f) load(f)});
+    file.addEventListener("change",function(){if(file.files[0]) load(file.files[0])});
+    reset.addEventListener("click",function(){st.blob=null;prev.style.display="none";drop.style.display="";reset.hidden=true;file.value="";onChange()});
+    async function load(f){
+      hideErr();
+      if(!f.type||f.type.indexOf("image/")!==0){showErr("Berkas ini bukan gambar. Pilih JPG, PNG, atau WebP.");return}
+      img.src=URL.createObjectURL(f);
+      await new Promise(function(r){img.onload=r;img.onerror=r});
+      var w=img.naturalWidth,h=img.naturalHeight;
+      if(!w){showErr("Gambar tidak bisa dibaca. Coba berkas lain.");return}
+      // Selalu dikecilkan dan diubah ke JPEG: lebih ringan dan metadata lokasi ikut terhapus.
+      var s=Math.min(1,1600/Math.max(w,h)), c=document.createElement("canvas");
+      c.width=Math.round(w*s); c.height=Math.round(h*s);
+      var g=c.getContext("2d"); g.fillStyle="#fff"; g.fillRect(0,0,c.width,c.height); g.drawImage(img,0,0,c.width,c.height);
+      st.blob=await new Promise(function(r){c.toBlob(r,"image/jpeg",0.85)});
+      $(prefix+"-meta").innerHTML=esc(f.name)+"<br>"+w+"×"+h+" px · "+esc(fmtBytes(f.size));
+      prev.style.display="flex"; drop.style.display="none"; reset.hidden=false; onChange();
+    }
+    st.load=load;
+    return st;
+  }
+  var foto=uploader("foto",function(){$("btn-foto").disabled=!foto.blob});
+  var wa=uploader("wa",function(){});
+  document.addEventListener("paste",function(e){
+    var it=Array.prototype.slice.call((e.clipboardData&&e.clipboardData.items)||[]).filter(function(i){return i.type.indexOf("image/")===0})[0];
+    if(!it) return;
+    if(active==="foto") foto.load(it.getAsFile()); else if(active==="wa") wa.load(it.getAsFile());
+  });
+  function keBase64(blob){
+    return new Promise(function(ok,gagal){
+      var fr=new FileReader();
+      fr.onload=function(){ok(String(fr.result).split(",")[1]||"")};
+      fr.onerror=function(){gagal(new Error("gambar tidak terbaca"))};
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  /* ---------- tampilkan ---------- */
+  var last=null;
+  function daftar(id,arr,sec){
+    arr=Array.isArray(arr)?arr.filter(Boolean):[];
+    $(id).innerHTML=arr.map(function(x){return "<li>"+esc(x)+"</li>"}).join("");
+    if(sec) $(sec).style.display=arr.length?"":"none";
+  }
+  function tampil(j){
+    var d=j.d||{}, h=j.h; last=j;
+    $("verdict").className="verdict z-"+h.zona;
+    $("v-label").textContent=h.label;
+    $("v-score").textContent=h.total+"%";
+    $("v-conf").textContent="indikasi hoaks · keyakinan "+h.yakin;
+    $("v-mark").style.left=h.total+"%";
+    $("v-sum").textContent=d.ringkasan||"";
+    daftar("klaim",d.klaim,"sec-klaim"); daftar("alasan",d.alasan,"sec-alasan");
+    $("comps").innerHTML=h.rows.map(function(r){
+      var off=r.skor===null;
+      return '<div class="comp'+(off?" off":"")+'"><div class="n">'+esc(r.n)+"<small>bobot "+r.w+'%</small></div><div class="v">'+(off?"tanpa data":r.skor+"%")+'</div><div class="bar"><i style="width:'+(off?0:r.skor)+'%"></i></div><div class="c">'+esc(off?"Tidak dihitung dalam skor akhir.":r.catatan)+"</div></div>";
+    }).join("");
+    var k=j.klarifikasi, kc=d.klarifikasi_cocok||{};
+    $("src-match").innerHTML=k
+      ?'<div class="src"><b>'+esc(k.id)+" · "+esc(k.kategori)+"</b><p>"+esc(k.fakta)+"</p><p><i>Hubungan dengan kiriman:</i> "+(kc.hubungan==="membenarkan"?"klarifikasi ini sejalan dengan isi kiriman":"klarifikasi ini membantah isi kiriman")+"</p>"+(tautanAman(k.sumber_url)?'<p><a href="'+esc(k.sumber_url)+'" target="_blank" rel="noopener">Baca rilis resmi</a></p>':"")+"</div>"
+      :'<div class="src"><p style="margin:0">Belum ada klarifikasi Pemkot yang cocok dengan kiriman ini.</p></div>';
+    var ru=(Array.isArray(j.rujukan)?j.rujukan:[]).filter(function(x){return x&&tautanAman(x.url)});
+    $("rujukan").innerHTML=ru.length?'<p class="hint" style="margin:10px 0 8px">Halaman web yang dibaca AI saat mencari pembanding:</p><div class="chips">'+ru.map(function(x){return '<a class="chip" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.judul)+"</a>"}).join("")+"</div>":"";
+    var kw=(Array.isArray(d.kata_kunci)?d.kata_kunci:[]).filter(Boolean).slice(0,5).join(" ")||String((d.klaim||[])[0]||"").slice(0,60);
+    var q=encodeURIComponent(kw);
+    $("links").innerHTML=[
+      ["TurnBackHoax (Mafindo)","https://turnbackhoax.id/?s="+q],
+      ["Google + kata hoaks","https://www.google.com/search?q="+q+"+hoaks"],
+      ["Google News","https://news.google.com/search?q="+q+"&hl=id&gl=ID&ceid=ID:id"]
+    ].map(function(l){return '<a class="chip" href="'+l[1]+'" target="_blank" rel="noopener">'+esc(l[0])+"</a>"}).join("");
+    var qe=$("queue"), catatan="";
+    if(j.tautan&&!j.tautan.terbaca) catatan=" Catatan: tautan tidak bisa dibuka server ("+esc(j.tautan.galat||"tidak terbaca")+"), sehingga penilaian hanya dari alamat dan isi yang ditempel.";
+    if(h.tinjau.length){qe.className="queue need";qe.innerHTML="<b>Diteruskan ke petugas Diskominfo untuk ditinjau.</b> Alasan: "+esc(h.tinjau.join(" dan "))+"."+catatan;}
+    else{qe.className="queue";qe.innerHTML="<b>Hasil otomatis.</b> Petugas Diskominfo tetap bisa mengoreksinya."+catatan;}
+    $("result").style.display="flex";
+    $("result").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  $("btn-copy").addEventListener("click",async function(){
+    if(!last) return; var d=last.d||{},h=last.h;
+    var txt="SI AHOX Kota Ambon\n"+h.label+" (indikasi hoaks "+h.total+"%, keyakinan "+h.yakin+")\n"+(d.ringkasan||"")+
+      "\n\nAlasan:\n"+(d.alasan||[]).map(function(x){return "- "+x}).join("\n")+
+      "\n\nHasil ini analisis otomatis AI, bukan pernyataan resmi Pemerintah Kota Ambon. Periksa sumber sebelum membagikan.";
+    try{await navigator.clipboard.writeText(txt);$("copied").textContent="Tersalin."}
+    catch(e){$("copied").textContent="Tidak bisa menyalin otomatis. Pilih teksnya secara manual."}
+    setTimeout(function(){$("copied").textContent=""},3000);
+  });
+
+  /* ---------- kirim ke server ---------- */
+  async function periksa(jenis){
+    hideErr();
+    if(!$("setuju").checked){showErr("Centang persetujuan di bawah formulir lebih dulu.");return}
+    var p={jenis:jenis,setuju:true}, blob=null;
+    if(jenis==="foto"){
+      if(!foto.blob) return; blob=foto.blob; p.konteks=$("foto-ctx").value.trim();
+    } else if(jenis==="link"){
+      p.url=$("link-url").value.trim(); p.teks=$("link-text").value.trim();
+      if(!p.url&&!p.teks){showErr("Isi alamat tautan atau tempel isi beritanya dulu.");return}
+    } else {
+      p.teks=$("wa-text").value.trim(); blob=wa.blob;
+      if(!p.teks&&!blob){showErr("Tempel isi pesan atau unggah tangkapan layarnya dulu.");return}
+    }
+    sibuk(true,blob?"Membaca gambar dan mencari pembanding…":"Menilai isi dan mencari pembanding…");
+    try{
+      if(blob) p.gambar={mime:"image/jpeg",data:await keBase64(blob)};
+      var r=await fetch("/api/periksa",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});
+      var j=null; try{j=await r.json()}catch(e){}
+      if(!r.ok||!j||!j.h) throw new Error((j&&j.galat)||"Server tidak menjawab dengan benar. Coba lagi.");
+      tampil(j);
+    }catch(e){
+      showErr(e&&e.message&&!/fetch|network/i.test(e.message)?e.message:"Tidak bisa terhubung ke server. Periksa koneksi internet lalu coba lagi.");
+    }finally{sibuk(false)}
+  }
+  $("btn-foto").addEventListener("click",function(){periksa("foto")});
+  $("btn-link").addEventListener("click",function(){periksa("link")});
+  $("btn-wa").addEventListener("click",function(){periksa("wa")});
+
+  function sibuk(b,msg){
+    $("status").style.display=b?"flex":"none"; if(msg) $("status-text").textContent=msg;
+    $("btn-link").disabled=b; $("btn-wa").disabled=b; $("btn-foto").disabled=b||!foto.blob;
+  }
+  function showErr(m){var e=$("err");e.textContent=m;e.style.display="block"}
+  function hideErr(){$("err").style.display="none"}
+})();
+</script>
+</body>
+</html>

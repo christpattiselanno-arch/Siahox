@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/periksa.js": { "maxDuration": 60 }
+  }
+}
