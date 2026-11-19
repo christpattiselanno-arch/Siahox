@@ -238,7 +238,7 @@
     $("btn-masuk").disabled=true;
     var r=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("sandi").value});
     $("btn-masuk").disabled=false; $("sandi").value="";
-    if(r.error||!r.data.user){showErr("Email atau kata sandi salah.");return}
+    if(r.error||!r.data.user){showErr("Gagal masuk: "+((r.error&&r.error.message)||"penyebab tidak dikenal"));return}
     masuk(r.data.user);
   });
   $("keluar").addEventListener("click",async function(){await db.auth.signOut();location.reload()});
